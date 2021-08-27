@@ -1,0 +1,13 @@
+firstapp/node_modules/
+firstapp/.expo/
+firstapp/npm-debug.*
+firstapp/*.jks
+firstapp/*.p8
+firstapp/*.p12
+firstapp/*.key
+firstapp/*.mobileprovision
+firstapp/*.orig.*
+firstapp/web-build/
+
+# macOS
+.DS_Store
