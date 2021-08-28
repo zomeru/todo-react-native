@@ -1,19 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TextInput } from 'react-native';
 
 export default function App() {
+  const [name, setName] = useState('Zomer');
+  const [age, setAge] = useState(23);
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.boldText}>Hello World!</Text>
-      </View>
-      <View style={styles.body}>
-        <Text>Lorem, ipsum dolor.</Text>
-        <Text>Lorem, ipsum dolor.</Text>
-        <Text>Lorem, ipsum dolor.</Text>
-      </View>
-      <StatusBar style='auto' />
+      <Text>Enter name:</Text>
+      <TextInput
+        multiline
+        style={styles.input}
+        placeholder='e.g. John Doe'
+        onChangeText={val => setName(val)}
+      />
+      <Text>Enter age:</Text>
+      <TextInput
+        keyboardType='numeric'
+        style={styles.input}
+        placeholder='e.g. 20'
+        onChangeText={val => setAge(val)}
+      />
+      <Text>
+        Name: {name}, age: {age}
+      </Text>
     </View>
   );
 }
@@ -25,15 +35,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  header: {
-    backgroundColor: 'pink',
-    padding: 20,
-  },
-  boldText: {
-    fontWeight: 'bold',
-  },
-  body: {
-    backgroundColor: 'yellow',
-    padding: 20,
+  input: {
+    borderWidth: 1,
+    borderColor: '#777',
+    padding: 8,
+    margin: 10,
+    width: 200,
   },
 });
