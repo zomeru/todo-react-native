@@ -9,7 +9,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../constants/Colors';
 
-const ListButton = ({ title, color, onPress, onDelete }) => {
+const ListButton = ({ title, color, onPress, onDelete, onOptions }) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -19,7 +19,7 @@ const ListButton = ({ title, color, onPress, onDelete }) => {
         <Text style={styles.itemTitle}>{title}</Text>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        <TouchableOpacity onPress={() => {}}>
+        <TouchableOpacity onPress={onOptions}>
           <Ionicons name='options-outline' size={24} color='white' />
         </TouchableOpacity>
         <TouchableOpacity onPress={onDelete}>
@@ -30,10 +30,12 @@ const ListButton = ({ title, color, onPress, onDelete }) => {
   );
 };
 
-const renderAddListIcon = addItem => {
+const renderAddListIcon = (navigation, addItemToLists) => {
   return (
     <TouchableOpacity
-      onPress={() => addItem({ title: 'MongoDB', color: Colors.green })}
+      onPress={() =>
+        navigation.navigate('Edit', { saveChanges: addItemToLists })
+      }
     >
       <Text style={styles.icon}>+</Text>
     </TouchableOpacity>
@@ -57,9 +59,14 @@ export default ({ navigation }) => {
     setListData([...listData]);
   };
 
+  const updateItemFromList = (index, item) => {
+    listData[index] = item;
+    setListData([...listData]);
+  };
+
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => renderAddListIcon(addItemToLists),
+      headerRight: () => renderAddListIcon(navigation, addItemToLists),
     });
   });
 
@@ -75,6 +82,13 @@ export default ({ navigation }) => {
               navigation={navigation}
               onPress={() => {
                 navigation.navigate('TodoList', { title, color });
+              }}
+              onOptions={() => {
+                navigation.navigate('Edit', {
+                  title,
+                  color,
+                  saveChanges: item => updateItemFromList(index, item),
+                });
               }}
               onDelete={() => removeItemFromLists(index)}
             />
