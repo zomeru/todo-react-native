@@ -7,8 +7,9 @@ import {
   TouchableOpacity,
   TextInput,
 } from 'react-native';
-import Colors from '../constants/Colors';
+import Colors from '../configs/Colors';
 import ColorSelector from '../components/ColorSelector';
+import Button from '../components/Button';
 
 const colorList = [
   'blue',
@@ -62,8 +63,8 @@ export default ({ navigation, route }) => {
           colorOptions={colorList}
         />
       </View>
-      <TouchableOpacity
-        style={styles.saveButton}
+      <Button
+        text='save'
         onPress={() => {
           if (title.length > 1) {
             route.params.saveChanges({ title, color });
@@ -72,11 +73,7 @@ export default ({ navigation, route }) => {
             setIsValid(false);
           }
         }}
-      >
-        <Text style={{ color: 'white', fontSize: 24, fontWeight: 'bold' }}>
-          Save
-        </Text>
-      </TouchableOpacity>
+      />
     </View>
   );
 };

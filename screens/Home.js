@@ -7,7 +7,7 @@ import {
   FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '../constants/Colors';
+import Colors from '../configs/Colors';
 
 const ListButton = ({ title, color, onPress, onDelete, onOptions }) => {
   return (
@@ -32,13 +32,22 @@ const ListButton = ({ title, color, onPress, onDelete, onOptions }) => {
 
 const renderAddListIcon = (navigation, addItemToLists) => {
   return (
-    <TouchableOpacity
-      onPress={() =>
-        navigation.navigate('Edit', { saveChanges: addItemToLists })
-      }
-    >
-      <Text style={styles.icon}>+</Text>
-    </TouchableOpacity>
+    <View style={{ flexDirection: 'row' }}>
+      <TouchableOpacity
+        style={{ justifyContent: 'center', marginRight: 12, marginTop: 3 }}
+        onPress={() => navigation.navigate('Settings')}
+      >
+        <Ionicons name='settings' size={16} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{ justifyContent: 'center', marginRight: 12 }}
+        onPress={() =>
+          navigation.navigate('Edit', { saveChanges: addItemToLists })
+        }
+      >
+        <Text style={styles.icon}>+</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
