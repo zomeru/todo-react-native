@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,13 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '../configs/Colors';
+import {
+  onSnapshot,
+  addDoc,
+  removeDoc,
+  updateDoc,
+} from '../services/Collections';
+import { firestore, auth } from 'firebase';
 
 const ListButton = ({ title, color, onPress, onDelete, onOptions }) => {
   return (
@@ -52,25 +59,44 @@ const renderAddListIcon = (navigation, addItemToLists) => {
 };
 
 export default ({ navigation }) => {
-  const [listData, setListData] = useState([
-    { title: 'React Native', color: Colors.blue },
-    { title: 'GraphQL', color: Colors.pink },
-    { title: 'Node.js', color: Colors.green },
-  ]);
+  const [listData, setListData] = useState([]);
+  const listRef = firestore()
+    .collection('users')
+    .doc(auth().currentUser.uid)
+    .collection('lists');
 
-  const addItemToLists = item => {
-    listData.push(item);
-    setListData([...listData]);
+  useEffect(() => {
+    onSnapshot(
+      listRef,
+      newLists => {
+        setListData(newLists);
+      },
+      {
+        sort: (a, b) => {
+          if (a.index < b.index) {
+            return -1;
+          }
+          if (a.index > b.index) {
+            return 1;
+          }
+
+          return 0;
+        },
+      }
+    );
+  }, []);
+
+  const addItemToLists = ({ title, color }) => {
+    const index = listData.length > 1 ? listData[listData - 1].index + 1 : 0;
+    addDoc(listRef, { title, color, index });
   };
 
-  const removeItemFromLists = index => {
-    listData.splice(index, 1);
-    setListData([...listData]);
+  const removeItemFromLists = id => {
+    removeDoc(listRef, id);
   };
 
-  const updateItemFromList = (index, item) => {
-    listData[index] = item;
-    setListData([...listData]);
+  const updateItemFromList = (id, item) => {
+    updateDoc(listRef, id, item);
   };
 
   useLayoutEffect(() => {
@@ -83,23 +109,24 @@ export default ({ navigation }) => {
     <View style={styles.container}>
       <FlatList
         data={listData}
-        renderItem={({ item: { title, color }, index }) => {
+        renderItem={({ item: { title, color, id, index } }) => {
           return (
             <ListButton
               title={title}
               color={color}
               navigation={navigation}
               onPress={() => {
-                navigation.navigate('TodoList', { title, color });
+                navigation.navigate('TodoList', { title, color, listId: id });
               }}
               onOptions={() => {
                 navigation.navigate('Edit', {
                   title,
                   color,
-                  saveChanges: item => updateItemFromList(index, item),
+                  saveChanges: newItem =>
+                    updateItemFromList(id, { index, ...newItem }),
                 });
               }}
-              onDelete={() => removeItemFromLists(index)}
+              onDelete={() => removeItemFromLists(id)}
             />
           );
         }}

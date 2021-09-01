@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,35 +7,64 @@ import {
   FlatList,
 } from 'react-native';
 import TodoItem from '../components/TodoItem';
-import Colors from '../configs/Colors';
+import {
+  onSnapshot,
+  addDoc,
+  removeDoc,
+  updateDoc,
+} from '../services/Collections';
+import { firestore, auth } from 'firebase';
 
 const renderAddListIcon = addItem => {
   return (
-    <TouchableOpacity
-      onPress={() => addItem({ text: '', isChecked: false, isNewItem: true })}
-    >
+    <TouchableOpacity onPress={() => addItem()}>
       <Text style={styles.icon}>+</Text>
     </TouchableOpacity>
   );
 };
 
-export default ({ navigation }) => {
-  const [todoItems, setTodoItems] = useState([
-    { text: 'Hello', isChecked: false },
-  ]);
+export default ({ navigation, route }) => {
+  let [todoItems, setTodoItems] = useState([]);
+  const [newItem, setNewItem] = useState();
 
-  const addItemToLists = item => {
-    todoItems.push(item);
-    setTodoItems([...todoItems]);
+  const todoItemsRef = firestore()
+    .collection('users')
+    .doc(auth().currentUser.uid)
+    .collection('lists')
+    .doc(route.params.listId)
+    .collection('todoItems');
+
+  useEffect(() => {
+    onSnapshot(
+      todoItemsRef,
+      newTodoItems => {
+        setTodoItems(newTodoItems);
+      },
+      {
+        sort: (a, b) => {
+          if (a.isChecked && !b.isChecked) {
+            return 1;
+          }
+          if (b.isChecked && !a.isChecked) {
+            return -1;
+          }
+
+          return 0;
+        },
+      }
+    );
+  }, []);
+
+  const addItemToLists = () => {
+    setNewItem({
+      text: '',
+      isChecked: false,
+      new: true,
+    });
   };
 
   const removeItemFromLists = index => {
     todoItems.splice(index, 1);
-    setTodoItems([...todoItems]);
-  };
-
-  const updateItem = (index, item) => {
-    todoItems[index] = item;
     setTodoItems([...todoItems]);
   };
 
@@ -45,28 +74,54 @@ export default ({ navigation }) => {
     });
   });
 
+  if (newItem) {
+    todoItems = [newItem, ...todoItems];
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
         data={todoItems}
-        renderItem={({ item: { text, isChecked, isNewItem }, index }) => {
+        renderItem={({ item: { id, text, isChecked, ...params }, index }) => {
           return (
             <TodoItem
+              {...params}
               text={text}
               isChecked={isChecked}
-              isNewItem={isNewItem}
               onChecked={() => {
-                const todoItem = todoItems[index];
-                todoItem.isChecked = !isChecked;
-                updateItem(index, todoItem);
+                let data = { text, isChecked: !isChecked };
+                if (id) {
+                  data.id = id;
+                }
+                addDoc(todoItemsRef, data);
               }}
               onChangeText={newText => {
-                const todoItem = todoItems[index];
-                todoItem.text = newText;
-                updateItem(index, todoItem);
+                if (params.new) {
+                  setNewItem({
+                    text: newText,
+                    isChecked,
+                    new: params.new,
+                  });
+                } else {
+                  todoItems[index].text = newText;
+                  setTodoItems([...todoItems]);
+                }
               }}
               onDelete={() => {
-                removeItemFromLists(index);
+                params.new ? setNewItem(null) : removeItemFromLists(index);
+                id && removeDoc(todoItemsRef, id);
+              }}
+              onBlur={() => {
+                if (text.length > 1) {
+                  let data = { text, isChecked };
+                  if (id) {
+                    data.id = id;
+                  }
+                  addDoc(todoItemsRef, data);
+                  params.new && setNewItem(null);
+                } else {
+                  params.new ? setNewItem(null) : removeItemFromLists(index);
+                }
               }}
             />
           );

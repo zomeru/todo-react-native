@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import LabeledInput from '../components/LabeledInput';
 import Colors from '../configs/Colors';
 import validator from 'validator';
-import { auth } from 'firebase';
+import { auth, firestore } from 'firebase';
 
 const validateFields = (email, password) => {
   return {
@@ -26,6 +26,7 @@ const createAccount = (email, password) => {
     .createUserWithEmailAndPassword(email, password)
     .then(({ user }) => {
       console.log('Creating user...');
+      firestore().collection('users').doc(user.uid).set({});
     });
 };
 
@@ -46,7 +47,7 @@ export default () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Fire Todo App</Text>
+      <Text style={styles.header}>Zoms Todo</Text>
       <View style={{ flex: 1 }}>
         <LabeledInput
           label='Email'
