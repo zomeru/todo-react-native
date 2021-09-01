@@ -8,7 +8,7 @@ import Login from './screens/Login';
 import Settings from './screens/Settings';
 import Colors from './configs/Colors';
 import * as firebase from 'firebase';
-import Config from 'react-native-config';
+import Secret from './configs/Secret';
 
 const Stack = createStackNavigator();
 const AuthStack = createStackNavigator();
@@ -82,12 +82,12 @@ export default function App() {
 }
 
 const firebaseConfig = {
-  apiKey: Config.FIREBASE_API_KEY,
-  authDomain: Config.FIREBASE_AUTH_DOMAIN,
-  projectId: Config.FIREBASE_PROJECT_ID,
-  storageBucket: Config.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: Config.FIREBASE_MESSAGING_SENDER_ID,
-  appId: Config.FIREBASE_APP_ID,
+  apiKey: Secret.FIREBASE_API_KEY,
+  authDomain: Secret.FIREBASE_AUTH_DOMAIN,
+  projectId: Secret.FIREBASE_PROJECT_ID,
+  storageBucket: Secret.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: Secret.FIREBASE_MESSAGING_SENDER_ID,
+  appId: Secret.FIREBASE_APP_ID,
 };
 
 if (!firebase.apps.length) {
