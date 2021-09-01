@@ -19,7 +19,13 @@ const validateFields = (email, password) => {
   };
 };
 
-const login = (email, password) => {};
+const login = (email, password) => {
+  auth()
+    .signInWithEmailAndPassword(email, password)
+    .then(() => {
+      console.log('Logged in!');
+    });
+};
 
 const createAccount = (email, password) => {
   auth()

@@ -7,12 +7,7 @@ import {
   FlatList,
 } from 'react-native';
 import TodoItem from '../components/TodoItem';
-import {
-  onSnapshot,
-  addDoc,
-  removeDoc,
-  updateDoc,
-} from '../services/Collections';
+import { onSnapshot, addDoc, removeDoc } from '../services/Collections';
 import { firestore, auth } from 'firebase';
 
 const renderAddListIcon = addItem => {
