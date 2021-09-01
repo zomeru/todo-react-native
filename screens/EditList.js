@@ -1,12 +1,6 @@
 import { CommonActions } from '@react-navigation/routers';
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
+import { StyleSheet, Text, View, TextInput } from 'react-native';
 import Colors from '../configs/Colors';
 import ColorSelector from '../components/ColorSelector';
 import Button from '../components/Button';

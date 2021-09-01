@@ -7,7 +7,6 @@ import {
   FlatList,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Colors from '../configs/Colors';
 import {
   onSnapshot,
   addDoc,
